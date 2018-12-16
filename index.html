@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Document</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
+        <style>
+            html,
+            body {
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+    </body>
+    <script src="geometry.js"></script>
+    <script src="helpers.js"></script>
+    <script src="script.js"></script>
+    <script id="vertex" type="x-shader/vertex-shader">
+        attribute vec3 aVertexPosition;
+        attribute vec3 aNormal;
+        uniform mat4 MVMatrix;
+        uniform mat4 PMatrix;
+
+        varying vec3 vNormal;
+
+        void main() {
+            vNormal = mat3(MVMatrix) * aNormal;
+
+            gl_Position = PMatrix * MVMatrix * vec4(aVertexPosition, 1.0);
+        }
+    </script>
+    <script id="fragment" type="x-shader/fragment-shader">
+        precision mediump float;
+        varying vec3 vNormal;
+        uniform vec4 uColor;
+        uniform vec3 uDirection;
+
+        void main() {
+            vec3 normale = normalize(vNormal);
+            vec3 direction = normalize(uDirection);
+
+            float lumiere = dot(normale, direction);
+
+            gl_FragColor = uColor;
+
+            gl_FragColor.rgb *= lumiere;
+        }
+    </script>
+</html>
