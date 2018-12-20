@@ -1,11 +1,9 @@
-# WebGl Gamepad
+# Experimentation WebGL
 
-_A little sphere in Poly with gamepad direction rotation_
+## Summary
+- WebGL Gamepad
+- WebGL Texture & transition
 
-Launch the script with this command line:
-
-```bash
-$ http-server .
-```
-
-**Made with <3**
+## Keep the links
+_All it's sample with goods tutorials_
+[WebGL API](https://developer.mozilla.org/fr/docs/Web/API/WebGL_API)
