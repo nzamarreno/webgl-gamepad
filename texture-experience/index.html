@@ -1,28 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <canvas id="canvas"></canvas>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js"></script>
+        <link href="style.css" rel="stylesheet" />
+        <title>Document</title>
 
-    <script id="vertex">
-        attribute vec3 aPosition;
+        <style></style>
+    </head>
+    <body>
+        <h1 class="baseline">Black <br />& White</h1>
+        <canvas id="canvas"></canvas>
+        <div class="container">
+            <h1>Experimentation</h1>
+            <p>
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. Lorem Ipsum has been the industry's standard dummy
+                text ever since the 1500s, when an unknown printer took a galley
+                of type and scrambled it to make a type specimen book. It has
+                survived not only five centuries, but also the leap into
+                electronic typesetting, remaining essentially unchanged. It was
+                popularised in the 1960s with the release of Letraset sheets
+                containing Lorem Ipsum passages, and more recently with desktop
+                publishing software like Aldus PageMaker including versions of
+                Lorem Ipsum.
+            </p>
+        </div>
 
-        void main() {
-            gl_Position = vec4(aPosition, 1.0);
-        }
-    </script>
+        <script id="vertex" type="x-shader/x-vertex">
+            attribute vec3 aPosition;
+            attribute vec2 aTextureCoord;
+            attribute mat4 uMatrix;
+            attribute mat4 pMatrix;
 
-    <script id="fragment">
-        precision mediump float;
+            varying highp vec2 vUv;
 
-        void main() {
-            gl_FragColor = vec4(0.3, 0.4, 0.2, 1.0);
-        }
-    </script>
-</body>
+            void main() {
+                vUv = aTextureCoord;
+                gl_Position = vec4(aPosition, 1.0);
+            }
+        </script>
+
+        <script id="fragment" type="x-shader/x-fragment">
+            precision mediump float;
+
+            varying vec2 vUv;
+
+            uniform sampler2D texture;
+            uniform sampler2D texture2;
+            uniform sampler2D disp;
+
+            // uniform float time;
+            // uniform float _rot;
+            uniform float dispFactor;
+            uniform float effectFactor;
+
+            // vec2 rotate(vec2 v, float a) {
+            //  float s = sin(a);
+            //  float c = cos(a);
+            //  mat2 m = mat2(c, -s, s, c);
+            //  return m * v;
+            // }
+
+            void main() {
+
+                vec2 uv = vUv;
+
+                // uv -= 0.5;
+                // vec2 rotUV = rotate(uv, _rot);
+                // uv += 0.5;
+
+                vec4 disp = texture2D(disp, uv);
+
+                vec2 distortedPosition = vec2(uv.x + dispFactor * (disp.r*effectFactor), uv.y);
+                vec2 distortedPosition2 = vec2(uv.x - (1.0 - dispFactor) * (disp.r*effectFactor), uv.y);
+
+                vec4 _texture = texture2D(texture, distortedPosition);
+                vec4 _texture2 = texture2D(texture2, distortedPosition2);
+
+                vec4 finalTexture = mix(_texture, _texture2, dispFactor);
+
+                gl_FragColor = finalTexture;
+                // gl_FragColor = disp;
+            }
+        </script>
+
+        <script src="create-shader.js"></script>
+        <script src="create-program.js"></script>
+        <script src="load-texture.js"></script>
+        <script src="create-buffer.js"></script>
+        <script src="script.js"></script>
+    </body>
 </html>
