@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/noisejs@2.1.0/index.js"></script>
+        <link href="style.css" rel="stylesheet" />
+        <title>Document</title>
+
+        <style></style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+
+        <script id="vertex" type="x-shader/x-vertex">
+            attribute vec3 aPosition;
+            attribute vec3 aNormal;
+            uniform float uTime;
+            uniform mat4 uMatrix;
+            uniform mat4 pMatrix;
+
+            void main() {
+                gl_Position = pMatrix * uMatrix * vec4(aPosition, 1.0);
+            }
+        </script>
+
+        <script id="fragment" type="x-shader/x-fragment">
+            precision mediump float;
+
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        </script>
+        <script src="geometry/geometry.js"></script>
+        <script src="create-shader.js"></script>
+        <script src="create-program.js"></script>
+        <script src="create-buffer.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
