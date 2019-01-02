@@ -131,6 +131,16 @@ Icosphere_vertices = planeGeometry.positions;
 Icosphere_indices = planeGeometry.indices;
 Icosphere_normals = planeGeometry.normals;
 
+let cubeGeometry = makePolyGeometry({
+    indices: Cube_indices,
+    positions: Cube_vertices,
+    uvs: []
+});
+
+Cube_vertices = cubeGeometry.positions;
+Cube_indices = cubeGeometry.indices;
+Cube_normals = cubeGeometry.normals;
+
 let rotateX = 0;
 let rotateY = 0;
 function turnAround(X, Y) {
@@ -150,20 +160,27 @@ function turnAround(X, Y) {
 }
 
 let angle = 0;
+
 function draw() {
     viewport();
+    angle = angle + 0.005;
     bindBuffer("vertex", Icosphere_vertices);
     bindBuffer("fragment", Icosphere_indices);
     bindBuffer("normal", Icosphere_normals);
-    angle = angle + 0.01;
-    mat4.translate(MVMatrix, mat4.create(), [0, 0, -5]);
-    mat4.rotateY(MVMatrix, MVMatrix, rotateX);
+    const cameraPosition = [0, 0, -10];
+    let MVMatrix = mat4.create();
+    MVMatrix = mat4.translate(MVMatrix, MVMatrix, cameraPosition);
+    MVMatrix = mat4.rotateY(mat4.create(), MVMatrix, angle, [0, 0, 0]);
+
+
+    // mat4.rotateY(MVMatrix, MVMatrix, rotateX);
     // mat4.rotateY(MVMatrix, MVMatrix, angle);
-
-    gl.uniform4fv(program.color, [0.8, Math.sin(angle), Math.sin(angle), 1.0]);
-
-    mat4.rotateX(MVMatrix, MVMatrix, rotateY);
-    gl.uniformMatrix4fv(program.MVMatrix, false, MVMatrix);
+    
+    gl.uniform4fv(program.color, [0.8, 0.2, 0.3, 1.0]);
+    
+    // mat4.rotateX(MVMatrix, MVMatrix, rotateY);
+    const sphereMatrix = mat4.translate(mat4.create(), MVMatrix, [0, 0, 0]);
+    gl.uniformMatrix4fv(program.MVMatrix, false, sphereMatrix);
 
     gl.drawElements(
         gl.TRIANGLES,
@@ -172,10 +189,28 @@ function draw() {
         0
     );
 
+    // Draw the cube
+    bindBuffer("vertex", Cube_vertices);
+    bindBuffer("fragment", Cube_indices);
+    bindBuffer("normal", Cube_normals);
+
+    const cubeMatrix = mat4.translate(mat4.create(), MVMatrix, [-3, 0, 0]);
+
+    gl.uniformMatrix4fv(program.MVMatrix, false, cubeMatrix);
+    gl.uniform4fv(program.color, [0.8, 0.5, 0.2, 1.0]);
+
+
+    gl.drawElements(
+        gl.TRIANGLES,
+        Cube_indices.length,
+        gl.UNSIGNED_SHORT,
+        0
+    );
+
+    let then = 0;
     requestAnimationFrame(draw);
 }
 
-const MVMatrix = mat4.create();
 const PMatrix = mat4.create();
 
 window.onload = function() {
